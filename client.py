@@ -9,12 +9,23 @@ init()
 screen = display.set_mode((WIDTH, HEIGHT))
 clock = time.Clock()
 display.set_caption("Пінг-Понг")
+SERVER_IP = '172.20.10.4' #######################
+
+############################
+#background = transform.scale(image.load("background.gif"), (WIDTH, HEIGHT))
+############################
+try:
+    background = transform.scale(image.load("picture.jpg"), (WIDTH, HEIGHT))
+except FileNotFoundError:
+    print("Файл не знайдено!")
+    background = None
+
 # ---СЕРВЕР ---
 def connect_to_server():
     while True:
         try:
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client.connect(('localhost', 8080)) # ---- Підключення до сервера
+            client.connect((SERVER_IP, 8080))# ---- Підключення до сервера
             buffer = ""
             game_state = {}
             my_id = int(client.recv(24).decode())
@@ -87,8 +98,15 @@ while True:
         display.update()
         continue  # Блокує гру після перемоги
 
+
+    if background:
+        screen.blit(background, (0, 0))
+    else:
+        screen.fill((30, 30, 30))  # Запасний колір, якщо картинка не завантажилась
+
     if game_state:
-        screen.fill((30, 30, 30))
+        #screen.fill((30, 30, 30))
+        #screen.blit(background, (0, 0))#############################
         draw.rect(screen, (0, 255, 0), (20, game_state['paddles']['0'], 20, 100))
         draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
         draw.circle(screen, (255, 255, 255), (game_state['ball']['x'], game_state['ball']['y']), 10)
